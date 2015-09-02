@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns = "http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>Kai&apos;s MIDI player</title>
+    <!-- polyfill -->
+    <script src="../inc/shim/Base64.js" type="text/javascript"></script>
+    <script src="../inc/shim/Base64binary.js" type="text/javascript"></script>
+    <script src="../inc/shim/WebAudioAPI.js" type="text/javascript"></script>
+    <!-- midi.js package -->
+    <script src="../js/midi/audioDetect.js" type="text/javascript"></script>
+    <script src="../js/midi/gm.js" type="text/javascript"></script>
+    <script src="../js/midi/loader.js" type="text/javascript"></script>
+    <script src="../js/midi/plugin.audiotag.js" type="text/javascript"></script>
+    <script src="../js/midi/plugin.webaudio.js" type="text/javascript"></script>
+    <script src="../js/midi/plugin.webmidi.js" type="text/javascript"></script>
+    <!-- utils -->
+    <script src="../js/util/dom_request_xhr.js" type="text/javascript"></script>
+    <script src="../js/util/dom_request_script.js" type="text/javascript"></script>
+  </head>
+  <body>
+    <script type="text/javascript">
+      
+      window.onload = function () {
+	MIDI.loadPlugin({
+	  soundfontUrl: "../../midi-js-soundfonts/FluidR3_GM/",
+	  //soundfontUrl: "./soundfont/",
+	  //instrument: "acoustic_grand_piano",
+	  //instrument: "acoustic_guitar_nylon",
+	  instruments: [ "acoustic_grand_piano", "bright_acoustic_piano", "acoustic_guitar_nylon" ], // or multiple instruments
+	  onprogress: function(state, progress) {
+	    console.log(state, progress);
+	  },
+	  onsuccess: function() {
+	    console.log("loadPlugin success!");
+	    document.getElementById("playButton").innerText = "Play";
+	  }
+	});
+      };
+
+      function playText() {
+	var text = document.getElementById("playText").value;
+	playMelody(text);
+      }
+      function playMelody(melody) {
+	//var melody = "C D E"; // ABC notation
+	//melody = "C4 D4 E4 ..."; // converted to note names
+	//melody = "60,62,64,65,67,69,71,72";
+	var notes = melody.split(",");
+	//var notes = [50,52,54,50,52,54]; // the MIDI notes
+	//var notes = [60,62,64,65,67,69,71,72,71,69,67,65,64,62,60,62,64,65,67,69,71,72,71,69,67,65,64,62,60]; // the MIDI notes
+	//notes = melody.split(' ');
+	var velocity = 100; // how hard the note hits
+	var channel = 1;
+	var delay = 0;
+	var noteDuration = 0.1;
+	var noteFrequency = 0.1;
+	// play the notes
+	for (var i = 0; i < notes.length; i++) {
+	  console.log("play Midi note " + notes[i] + "=" + MIDI.noteToKey[notes[i]]);
+	  MIDI.noteOn(channel, notes[i], velocity, delay);
+	  MIDI.noteOff(channel, notes[i], delay + noteDuration);
+	  delay += noteFrequency;
+	}
+	console.log(MIDI.keyToNote["C4"]); // A0 => 21
+      }
+    </script>
+    <div>
+      <input type="text" id="playText" value="60,62,64,65,67,69,71,72"/>
+      <input type="select" id="playChannel"></select></div>
+    <div><button id="playButton" onclick="playText()">(loading sounds...)</button></div>
+  </body>
+</html>
