@@ -28,24 +28,11 @@
 	  html += '<option value="'+key+'">'+key+'</option>';
 	}
 	document.getElementById("midiInstruments").innerHTML = html;
-	var instruments2 = [
-	  "acoustic_grand_piano",
-	  "bright_acoustic_piano",
-	  "electric_grand_piano",
-	  "honkytonk_piano",
-	  "electric_piano_1",
-	  "electric_piano_2",
-	  "harpsichord",
-	  "clavinet",
-	  "celesta",
-	  "glockenspiel",
-	  "acoustic_guitar_nylon" ];
 	MIDI.loadPlugin({
-	  soundfontUrl: "../midi-js-soundfonts/FluidR3_GM/",
-	  //soundfontUrl: "./soundfont/",
+	  //soundfontUrl: "../midi-js-soundfonts/FluidR3_GM/",
+	  soundfontUrl: "./soundfont/",
 	  instrument: "acoustic_grand_piano",
 	  //instruments: ["acoustic_grand_piano", "harpsichord", "church_organ"],
-	  //instruments: instruments,
 	  onprogress: function(state, percent) {
 	    console.log(state, percent);
 	    document.getElementById("status").innerText += ". ";
