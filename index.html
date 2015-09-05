@@ -21,7 +21,8 @@
     <style type="text/css">
       body { font-family: Arial; }
       #playWord { width: 30em; }
-      a { text-decoration: none; }
+      #melodies { white-space: pre-wrap; font-family: "Lucida Console", Monaco, monospace; line-height: 1.4em; }
+      a { text-decoration: none; background-color: #FDDDE6; }
     </style>
     
   </head>
@@ -34,69 +35,100 @@
 	for (var key in MIDI.GM.byName) {
 	  html += '<option value="'+key+'">'+key+'</option>';
 	}
-	document.getElementById("midiInstruments").innerHTML = html;
+	document.getElementById("playInstrument").innerHTML = html;
+	var instrument = "acoustic_grand_piano";
+	var channel = 0;
+	document.getElementById("status").innerText = "loading " + instrument + " to channel " + channel;
 	MIDI.loadPlugin({
 	  soundfontUrl: "../midi-js-soundfonts/FluidR3_GM/",
 	  //soundfontUrl: "./soundfont/",
-	  instrument: "acoustic_grand_piano",
+	  instrument: instrument,
 	  //instruments: ["acoustic_grand_piano", "harpsichord", "church_organ"],
 	  onprogress: function(state, percent) {
 	    //console.log(state, percent);
 	    document.getElementById("status").innerText += ". ";
 	  },
 	  onsuccess: function() {
-	    console.log("loadPlugin success!");
-	    MIDI.programChange(0, MIDI.GM.byName["acoustic_grand_piano"].number);
-	    //MIDI.programChange(1, MIDI.GM.byName["harpsichord"].number);
-	    //MIDI.programChange(2, MIDI.GM.byName["church_organ"].number);
-	    document.getElementById("status").innerText = "";
-	    //document.getElementById("playButton").innerText = "Play";
+	    successfulLoad(instrument, channel);
+	    loadInstrument("tubular_bells",1,
+			   function(){ loadInstrument("vibraphone",2) })
 	  }
 	});
       };
-
-      function loadInstrument(instrumentName, channel) {
-	var instrumentName = document.getElementById('midiInstruments').value;
+      function loadInstrumentFromPage(successFunc) {
+	var instrument = document.getElementById("playInstrument").value;
 	var channel = document.getElementById("playChannel").value;
-	document.getElementById("status").innerText = "loading " + instrumentName + " to channel " + channel;
+	loadInstrument(instrument, channel, successFunc);
+      }
+      function loadInstrument(instrument, channel, successFunc) {
+	if (instrument === undefined || instrument === "" || channel === undefined) {
+	  return;
+	}
+	document.getElementById("status").innerText = "loading " + instrument + " to channel " + channel;
 	MIDI.loadResource({
-	  instrument: instrumentName,
+	  instrument: instrument,
 	  onprogress: function(state, percent) {
 	    //console.log(state, percent);
 	    document.getElementById("status").innerText += ". ";	    
 	  },
 	  onsuccess: function() {
-	    MIDI.programChange(channel, MIDI.GM.byName[instrumentName].number);
-	    document.getElementById("status").innerText = "";
-	    console.log("loaded " + instrumentName + " on channel " + channel);
+	    successfulLoad(instrument, channel);
+	    if (successFunc !== undefined) successFunc();
 	  }
 	})
       }
+      function wishHappy() {
+	var time = 0;
+	
+	setTimeout(function(){ playWordInPage('HAPPY',   0) }, time);
+	time += 1200;
+	setTimeout(function(){ playWordInPage('BIRTHDAY',0) }, time);
+	time += 1900;
+	setTimeout(function(){ playWordInPage('LEONORE', 0, true) }, time);
+	time += 1700;
+	
+	setTimeout(function(){ playWordInPage('HAPPY',   1) }, time);
+	time += 1200;
+	setTimeout(function(){ playWordInPage('BIRTHDAY',1) }, time);
+	time += 1900;
+	setTimeout(function(){ playWordInPage('LEONORE', 1, true) }, time);
+	time += 1700;
+	
+	setTimeout(function(){ playWordInPage('HAPPY',   2) }, time);
+	time += 1200;
+	setTimeout(function(){ playWordInPage('BIRTHDAY',2) }, time);
+	time += 1900;
+	setTimeout(function(){ playWordInPage('LEONORE', 2, true) }, time);
+	time += 1700;
+	
+	setTimeout(function(){ playWord('HAPPY',   0) }, time);
+	time += 100;
+	setTimeout(function(){ playWord('BIRTHDAY',0) }, time);
+	time += 100;
+	setTimeout(function(){ playWord('LEONORE', 0) }, time);
+	time += 100;
+	setTimeout(function(){ playWord('HAPPY',   1) }, time);
+	time += 100;
+	setTimeout(function(){ playWord('BIRTHDAY',1) }, time);
+	time += 100;
+	setTimeout(function(){ playWord('LEONORE', 1) }, time);
+	time += 100;
+	setTimeout(function(){ playWord('HAPPY',   2) }, time);
+	time += 100;
+	setTimeout(function(){ playWord('BIRTHDAY',2) }, time);
+	time += 100;
+	setTimeout(function(){ playWord('LEONORE', 2) }, time);
+	time += 100;
 
-      chords = [[37,59,61,71,80],[38,60,62,72,81],[39,61,63,73,82]];
-      function playChords() {
-	for (var i = 0; i < 9; i++){
-	  playChord(i/2, chords[i%chords.length]);
-	}	
-      }
-      function playChord(delay, chord) {
-        MIDI.chordOn(0, chord, 127, delay);
-        MIDI.chordOff(0, chord, delay+1);
+      }	
+      var channelInstruments = new Array(16);
+      function successfulLoad(instrument, channel) {
+	MIDI.programChange(channel, MIDI.GM.byName[instrument].number);
+	channelInstruments[channel] = instrument;
+	document.getElementById("status").innerText = "";
+	console.log("loaded " + instrument + " on channel " + channel);
       }
 
-      function playText() {
-	var text = document.getElementById("playText").value;
-	var channel = document.getElementById("playChannel").value;
-	playMelody(text.split(","), channel);
-      }
-      function playWord() {
-	var word = document.getElementById("playWord").value;
-	var channel = document.getElementById("playChannel").value;
-	var notes = text2Notes(word);
-	playMelody(notes, channel);
-	var notesArray = '['+notes.join(',')+']';
-	document.getElementById("melodies").innerHTML += '<a href="javascript:void(playMelody('+notesArray+','+channel+'))">' + word + '</a> ';
-      }
       var note2code = { "C" : 60, "D" : 62, "E" : 64, "F" : 65, "G" : 67, "A" : 69, "B" : 71,
 			"c" : 72, "d" : 74, "e" : 76, "f" : 77, "g" : 79, "a" : 81, "b" : 83 }
       var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".split("");
@@ -110,22 +142,39 @@
 	var notes = [];
 	for (var i = 0; i < letters.length; i++) {
 	  notes[i] = note2code[char2note[letters[i]]];
-	  //console.log(letters[i], notes[i]);
 	}
 	return notes;
       }
-      function playMelody(notes, channel) {
-	//var melody = "C D E"; // ABC notation
-	//melody = "C4 D4 E4 ..."; // converted to note names
-	//melody = "60,62,64,65,67,69,71,72";
-	//var notes = [50,52,54,50,52,54]; // the MIDI notes
-	//var notes = [60,62,64,65,67,69,71,72,71,69,67,65,64,62,60,62,64,65,67,69,71,72,71,69,67,65,64,62,60]; // the MIDI notes
-	//notes = melody.split(' ');
+      // cdecd.def.f.e.e.cdecd.def.g.c. // J'ai du bon tabac
+      // cccde.d.ceddc.. ddddA.A.dcBAG.. // Au clair de la lune
+      // GGA.G.c.B. GGA.G.d.c. GGg.e.c.B.A. ffe.c.d.c. // Happy Birthday
+      // B B c d d c B A G G A B B A A . B B c d d c B A G G A B A G G // Ode to Joy
+      // c d e c c d e c e f g.. e f g... gagfe c gagfe c  c G c... c G c... // Frere Jacques
+      // c c d e c e d G c c d e c.. B.. c c d e f e d c B G A B c.. c.. // Yankee Doodle
+      // C  C  C DE  E DE FG     cccGGGEEECCCG FE DC      // Row your boat
+
+      function playWordFromInput() {
+	var word = document.getElementById("playWord").value;
+	var channel = document.getElementById("playChannel").value;
+	loadInstrumentFromPage(function() { playWordInPage(word, channel); });	
+      }
+      function playWordInPage(word, channel, newline) {
+	playWord(word, channel);
+	document.getElementById("melodies").innerHTML += '<a href="javascript:void(playWord(\''+word+'\','+channel+'))">' + word + '</a> ';
+	if (newline) document.getElementById("melodies").innerHTML += '<br/>';
+      }
+      function playWord(word, channel) {
+	document.getElementById("playWord").value = word;
+	document.getElementById("playChannel").value = channel;
+	document.getElementById('playInstrument').value = channelInstruments[channel]
+	var notes = text2Notes(word);
+	playNotes(notes, channel);
+      }
+      function playNotes(notes, channel) {
 	var velocity = 100; // how hard the note hits
 	var delay = 0;
 	var noteDuration = 0.2;
-	var noteFrequency = 0.1;
-	// play the notes
+	var noteFrequency = 0.2;
 	for (var i = 0; i < notes.length; i++) {
 	  //console.log("play Midi note " + notes[i] + "=" + MIDI.noteToKey[notes[i]]);
 	  MIDI.noteOn(channel, notes[i], velocity, delay);
@@ -134,17 +183,47 @@
 	}
 	//console.log(MIDI.keyToNote["C4"]); // A0 => 21
       }
+      function updateChannel() {
+	var i;
+	if (channelInstruments[document.getElementById('playChannel').value] !== undefined) {
+	  // search for first unused channel, if there is one
+	  for (i = 0; i < channelInstruments.length; i++) {
+	    if(channelInstruments[i] === undefined) {
+	      document.getElementById('playChannel').value = i;
+	      break;
+	    }
+	  }
+	}
+      }
+      function updateInstrument() {	
+	if (channelInstruments[document.getElementById('playChannel').value] !== undefined) {
+	  document.getElementById('playInstrument').value = channelInstruments[document.getElementById('playChannel').value];
+	} else {
+	  document.getElementById('playInstrument').value = "";
+	}
+      }
+      // Just for testing
+      chords = [[37,59,61,71,80],[38,60,62,72,81],[39,61,63,73,82]];
+      function playChords() {
+	for (var i = 0; i < 6; i++){
+	  playChord(i/2, chords[i%chords.length]);
+	}	
+      }
+      function playChord(delay, chord) {
+        MIDI.chordOn(0, chord, 127, delay);
+        MIDI.chordOff(0, chord, delay+1);
+      }
+
     </script>
     <div>
-      <input type="text" id="playWord" value="Happy Birthday Leonore!"/>
-      <button id="playWordButton" onclick="playWord()">Play</button>
-    </div>
-    <div id="melodies"></div>
-    
-    <div>
-      <select id="midiInstruments">
+      <button id="playHBD" onclick="wishHappy()">HBD</button>
+      <input type="text" id="playWord" value="HBD"
+	     onclick="this.select();"
+	     onkeydown="if (event.keyCode == 13) document.getElementById('playWordButton').click()"/>
+      <button id="playWordButton" onclick="playWordFromInput()">Play</button>
+      <select id="playInstrument" onChange="updateChannel()">
       </select>
-      <select id="playChannel">
+      <select id="playChannel" onChange="updateInstrument()">
 	<option value="0" selected="selected">0</option> 
 	<option value="1">1</option>
 	<option value="2">2</option>
@@ -162,20 +241,17 @@
 	<option value="14">14</option>
 	<option value="15">15</option>
       </select>
-      <button id="loadNew" onclick="loadInstrument()">Load new</button>
+      <!--<button id="loadNew" onclick="loadInstrumentFromPage()">Load new</button>-->
     </div>
+    <div id="melodies"></div>
     <div><span id="status">loading sounds</span></div>
 
-    <pre>
-      Idea: make a kind of text with words that when you click on them make music.
-      Idea: use ABC notation on full alphabet, at least for octave, maybe also duration, maybe also incidentals
-    </pre>
+    <!-- pre>
+      TODO: use ABC notation also for duration, maybe also incidentals
+      TODO: don't allow HTML, or sanitize it
+    </pre -->
 
     <!--
-    <div>
-      <input type="text" id="playText" value="60,62,64,65,67,69,71,72"/>
-    </div>
-    <div><button id="playButton" onclick="playText()">Loading sounds</button></div>
     <div><button id="playChords" onclick="playChords()">Play Chords</button></div>
     -->
   </body>
