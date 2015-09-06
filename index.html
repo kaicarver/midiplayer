@@ -40,7 +40,7 @@
 	var channel = 0;
 	document.getElementById("status").innerText = "loading " + instrument + " to channel " + channel;
 	MIDI.loadPlugin({
-	  soundfontUrl: "../midi-js-soundfonts/FluidR3_GM/",
+	  soundfontUrl: "./soundfonts/FluidR3_GM/",
 	  //soundfontUrl: "./soundfont/",
 	  instrument: instrument,
 	  //instruments: ["acoustic_grand_piano", "harpsichord", "church_organ"],
@@ -217,7 +217,7 @@
     </script>
     <div>
       <button id="playHBD" onclick="wishHappy()">HBD</button>
-      <input type="text" id="playWord" value="HBD"
+      <input type="text" id="playWord" value="Bon Anniversaire Leonore!"
 	     onclick="this.select();"
 	     onkeydown="if (event.keyCode == 13) document.getElementById('playWordButton').click()"/>
       <button id="playWordButton" onclick="playWordFromInput()">Play</button>
