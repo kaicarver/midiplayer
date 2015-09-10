@@ -29,7 +29,14 @@
   <body>
     <script type="text/javascript">
       
+      personName = 'LEONORE';
       window.onload = function () {
+	if (getParameterByName('playWord') !== "") {
+	  document.getElementById('playWord').value = getParameterByName('playWord');
+	}
+	if (getParameterByName('personName') !== "") {
+	  personName = getParameterByName('personName');
+	}
 	var instruments = Object.keys(MIDI.GM.byName);
 	var html = "";
 	for (var key in MIDI.GM.byName) {
@@ -80,44 +87,44 @@
       function wishHappy() {
 	var time = 0;
 	
-	setTimeout(function(){ playWordInPage('HAPPY',   0) }, time);
+	setTimeout(function(){ playWordInPage('HAPPY',   0, 2) }, time);
 	time += 1200;
 	setTimeout(function(){ playWordInPage('BIRTHDAY',0) }, time);
 	time += 1900;
-	setTimeout(function(){ playWordInPage('LEONORE', 0, true) }, time);
+	setTimeout(function(){ playWordInPage(personName, 0, 1) }, time);
 	time += 1700;
 	
 	setTimeout(function(){ playWordInPage('HAPPY',   1) }, time);
 	time += 1200;
 	setTimeout(function(){ playWordInPage('BIRTHDAY',1) }, time);
 	time += 1900;
-	setTimeout(function(){ playWordInPage('LEONORE', 1, true) }, time);
+	setTimeout(function(){ playWordInPage(personName, 1, 1) }, time);
 	time += 1700;
 	
 	setTimeout(function(){ playWordInPage('HAPPY',   2) }, time);
 	time += 1200;
 	setTimeout(function(){ playWordInPage('BIRTHDAY',2) }, time);
 	time += 1900;
-	setTimeout(function(){ playWordInPage('LEONORE', 2, true) }, time);
+	setTimeout(function(){ playWordInPage(personName, 2, 1) }, time);
 	time += 1700;
 	
 	setTimeout(function(){ playWord('HAPPY',   0) }, time);
 	time += 100;
 	setTimeout(function(){ playWord('BIRTHDAY',0) }, time);
 	time += 100;
-	setTimeout(function(){ playWord('LEONORE', 0) }, time);
+	setTimeout(function(){ playWord(personName, 0) }, time);
 	time += 100;
 	setTimeout(function(){ playWord('HAPPY',   1) }, time);
 	time += 100;
 	setTimeout(function(){ playWord('BIRTHDAY',1) }, time);
 	time += 100;
-	setTimeout(function(){ playWord('LEONORE', 1) }, time);
+	setTimeout(function(){ playWord(personName, 1) }, time);
 	time += 100;
 	setTimeout(function(){ playWord('HAPPY',   2) }, time);
 	time += 100;
 	setTimeout(function(){ playWord('BIRTHDAY',2) }, time);
 	time += 100;
-	setTimeout(function(){ playWord('LEONORE', 2) }, time);
+	setTimeout(function(){ playWord(personName, 2) }, time);
 	time += 100;
 
       }	
@@ -152,6 +159,8 @@
       // c d e c c d e c e f g.. e f g... gagfe c gagfe c  c G c... c G c... // Frere Jacques
       // c c d e c e d G c c d e c.. B.. c c d e f e d c B G A B c.. c.. // Yankee Doodle
       // C  C  C DE  E DE FG     cccGGGEEECCCG FE DC      // Row your boat
+      // best find so far:
+      // vive la france
 
       function playWordFromInput() {
 	var word = document.getElementById("playWord").value;
@@ -160,8 +169,9 @@
       }
       function playWordInPage(word, channel, newline) {
 	playWord(word, channel);
+	if (newline && newline & 2) document.getElementById("melodies").innerHTML += '<br/>';
 	document.getElementById("melodies").innerHTML += '<a href="javascript:void(playWord(\''+word+'\','+channel+'))">' + word + '</a> ';
-	if (newline) document.getElementById("melodies").innerHTML += '<br/>';
+	if (newline && newline & 1) document.getElementById("melodies").innerHTML += '<br/>';
       }
       function playWord(word, channel) {
 	document.getElementById("playWord").value = word;
@@ -214,11 +224,16 @@
         MIDI.chordOff(0, chord, delay+1);
       }
 
+      function getParameterByName(name) {
+	name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+	var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+	    results = regex.exec(location.search);
+	return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+      }
     </script>
     <div>
       <button id="playHBD" onclick="wishHappy()">HBD</button>
       <input type="text" id="playWord" value="Bon Anniversaire Leonore!"
-	     onclick="this.select();"
 	     onkeydown="if (event.keyCode == 13) document.getElementById('playWordButton').click()"/>
       <button id="playWordButton" onclick="playWordFromInput()">Play</button>
       <select id="playInstrument" onChange="updateChannel()">
