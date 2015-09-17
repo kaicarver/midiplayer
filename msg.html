@@ -20,9 +20,9 @@
 
     <style type="text/css">
       body { font-family: Arial; font-size: 4vw; text-align: center; }
-      button { font-family: Arial; font-size: 7vw; }
+      button { font-family: Arial; font-size: 6.5vw; }
       select { font-family: Arial; font-size: 4vw; border: 0px solid; outline: none; }
-      #playWordInput { width: 8em; font-size: 7vw; border: 0px solid; outline: none; }
+      #message { width: 8.4em; font-size: 6.5vw; border: 0px solid; outline: none; }
       #melodies { white-space: pre-wrap; font-family: "Lucida Console", Monaco, monospace; line-height: 1.7em; }
       #melodies .playLink { font-size: 6vw; }
       #signature .playLink { font-size: 3vw; }
@@ -38,8 +38,8 @@
       var signature = 'from Kai';
       var signatureDelay = 4000; // seconds before signature is played the first time anything is played
       window.onload = function () {
-	if (getParameterByName('playWordInput') !== "") {
-	  document.getElementById('playWordInput').value = getParameterByName('playWordInput');
+	if (getParameterByName('message') !== "") {
+	  document.getElementById('message').value = getParameterByName('message');
 	}
 	if (getParameterByName('personName') !== "") {
 	  personName = getParameterByName('personName');
@@ -148,8 +148,9 @@
       
       var note2code = { "C" : 60, "D" : 62, "E" : 64, "F" : 65, "G" : 67, "A" : 69, "B" : 71,
 			"c" : 72, "d" : 74, "e" : 76, "f" : 77, "g" : 79, "a" : 81, "b" : 83 }
-      var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".split("");
-      var notes = "ABCDEFGABCDEFGABCDEFGABCDEabcdefgabcdefgabcdefgabcde".split("");
+      var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдеёжзийклмнопрстуфхцчшщъыьэюя".split("");
+      var notes = "ABCDEFGABCDEFGABCDEFGABCDEabcdefgabcdefgabcdefgabcdeABBGDEEGEABCDEFGABCDEFGABCDEFGABCabbgdeegeabcdefgabcdefgabcdefgabc".split("")
+
       var char2note = {};
       for (var i = 0; i < chars.length; i++) {
 	char2note[chars[i]] = notes[i];
@@ -169,11 +170,12 @@
       // c d e c c d e c e f g.. e f g... gagfe c gagfe c  c G c... c G c... // Frere Jacques
       // c c d e c e d G c c d e c.. B.. c c d e f e d c B G A B c.. c.. // Yankee Doodle
       // C  C  C DE  E DE FG     cccGGGEEECCCG FE DC      // Row your boat
+      // С днем ​​рождения
       // best find so far:
       // vive la france
       
       function playWordFromInput() {
-	var word = document.getElementById("playWordInput").value;
+	var word = document.getElementById("message").value;
 	var channel = document.getElementById("playChannel").value;
 	loadInstrumentFromPage(function() { playWordInPage(word, channel, 0, true); });	
       }
@@ -194,7 +196,7 @@
 	}
       }
       function playWord(word, channel) {
-	document.getElementById("playWordInput").value = word;
+	document.getElementById("message").value = word;
 	document.getElementById("playChannel").value = channel;
 	document.getElementById('playInstrument').value = channelInstruments[channel]
 	var notes = text2Notes(word);
@@ -251,7 +253,7 @@
       }
     </script>
     <div>
-      <input type="text" id="playWordInput" value="Bon Anniv Adel!"
+      <input type="text" id="message" value="Bon Anniv Adel!"
 	     onkeydown="if (event.keyCode == 13) document.getElementById('playWordButton').click()"/>
       <button id="playWordButton" onclick="playWordFromInput()">Play</button>
       <button id="playHBD" onclick="wishHappy()">HBD</button>
