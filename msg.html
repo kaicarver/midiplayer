@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html xmlns = "http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>Kai&apos;s MIDI player</title>
+    <!-- polyfill -->
+    <script src="inc/shim/Base64.js" type="text/javascript"></script>
+    <script src="inc/shim/Base64binary.js" type="text/javascript"></script>
+    <script src="inc/shim/WebAudioAPI.js" type="text/javascript"></script>
+    <!-- midi.js package -->
+    <script src="js/midi/audioDetect.js" type="text/javascript"></script>
+    <script src="js/midi/gm.js" type="text/javascript"></script>
+    <script src="js/midi/loader.js" type="text/javascript"></script>
+    <script src="js/midi/plugin.audiotag.js" type="text/javascript"></script>
+    <script src="js/midi/plugin.webaudio.js" type="text/javascript"></script>
+    <script src="js/midi/plugin.webmidi.js" type="text/javascript"></script>
+    <!-- utils -->
+    <script src="js/util/dom_request_xhr.js" type="text/javascript"></script>
+    <script src="js/util/dom_request_script.js" type="text/javascript"></script>
+
+    <style type="text/css">
+      body { font-family: Arial; font-size: 4vw; text-align: center; }
+      button { font-family: Arial; font-size: 7vw; }
+      select { font-family: Arial; font-size: 4vw; border: 0px solid; outline: none; }
+      #playWordInput { width: 8em; font-size: 7vw; border: 0px solid; outline: none; }
+      #melodies { white-space: pre-wrap; font-family: "Lucida Console", Monaco, monospace; line-height: 1.7em; }
+      #melodies .playLink { font-size: 6vw; }
+      #signature .playLink { font-size: 3vw; }
+      #status { font-size: 2vw; }
+      a { text-decoration: none; background-color: #FDDDE6; }
+    </style>
+    
+  </head>
+  <body>
+    <script type="text/javascript">
+      
+      var personName = 'ADEL';
+      var signature = 'from Kai';
+      var signatureDelay = 4000; // seconds before signature is played the first time anything is played
+      window.onload = function () {
+	if (getParameterByName('playWordInput') !== "") {
+	  document.getElementById('playWordInput').value = getParameterByName('playWordInput');
+	}
+	if (getParameterByName('personName') !== "") {
+	  personName = getParameterByName('personName');
+	}
+	var instruments = Object.keys(MIDI.GM.byName);
+	var html = "";
+	for (var key in MIDI.GM.byName) {
+	  html += '<option value="'+key+'">'+key+'</option>';
+	}
+	document.getElementById("playInstrument").innerHTML = html;
+	var instrument = "acoustic_grand_piano";
+	var channel = 0;
+	document.getElementById("status").innerText = "loading " + instrument + " to channel " + channel;
+	MIDI.loadPlugin({
+	  soundfontUrl: "./soundfonts/FluidR3_GM/",
+	  //soundfontUrl: "./soundfont/",
+	  instrument: instrument,
+	  //instruments: ["acoustic_grand_piano", "harpsichord", "church_organ"],
+	  onprogress: function(state, percent) {
+	    //console.log(state, percent);
+	    document.getElementById("status").innerText += ". ";
+	  },
+	  onsuccess: function() {
+	    successfulLoad(instrument, channel);
+	    loadInstrument("tubular_bells",1,
+			   function(){ loadInstrument("vibraphone",2) })
+	  }
+	});
+      };
+      function loadInstrumentFromPage(successFunc) {
+	var instrument = document.getElementById("playInstrument").value;
+	var channel = document.getElementById("playChannel").value;
+	loadInstrument(instrument, channel, successFunc);
+      }
+      function loadInstrument(instrument, channel, successFunc) {
+	if (instrument === undefined || instrument === "" || channel === undefined) {
+	  return;
+	}
+	document.getElementById("status").innerText = "loading " + instrument + " to channel " + channel;
+	MIDI.loadResource({
+	  instrument: instrument,
+	  onprogress: function(state, percent) {
+	    //console.log(state, percent);
+	    document.getElementById("status").innerText += ". ";	    
+	  },
+	  onsuccess: function() {
+	    successfulLoad(instrument, channel);
+	    if (successFunc !== undefined) successFunc();
+	  }
+	})
+      }
+      function wishHappy() {
+	var time = 0;
+	
+	setTimeout(function(){ playWordInPage('HAPPY',   0, 2) }, time);
+	time += 1200;
+	setTimeout(function(){ playWordInPage('BDAY',0) }, time);
+	time += 1300;
+	setTimeout(function(){ playWordInPage(personName, 0, 1) }, time);
+	time += 1700;
+	
+	setTimeout(function(){ playWordInPage('HAPPY',   1) }, time);
+	time += 1200;
+	setTimeout(function(){ playWordInPage('BDAY',1) }, time);
+	time += 1300;
+	setTimeout(function(){ playWordInPage(personName, 1, 1) }, time);
+	time += 1700;
+	
+	setTimeout(function(){ playWordInPage('HAPPY',   2) }, time);
+	time += 1200;
+	setTimeout(function(){ playWordInPage('BDAY',2) }, time);
+	time += 1300;
+	setTimeout(function(){ playWordInPage(personName, 2, 1) }, time);
+	time += 1700;
+
+	// play all at about the same time
+	for (var i = 0; i < 3; i++) {
+	  setTimeout(function(){ playWord('HAPPY',   0) }, time);
+	  time += 100;
+	  setTimeout(function(){ playWord('BDAY',0) }, time);
+	  time += 100;
+	  setTimeout(function(){ playWord(personName, 0) }, time);
+	  time += 100;
+	  setTimeout(function(){ playWord('HAPPY',   1) }, time);
+	  time += 100;
+	  setTimeout(function(){ playWord('BDAY',1) }, time);
+	  time += 100;
+	  setTimeout(function(){ playWord(personName, 1) }, time);
+	  time += 100;
+	  setTimeout(function(){ playWord('HAPPY',   2) }, time);
+	  time += 100;
+	  setTimeout(function(){ playWord('BDAY',2) }, time);
+	  time += 100;
+	  setTimeout(function(){ playWord(personName, 2) }, time);
+	  time += 100;
+	}
+	
+      }	
+      var channelInstruments = new Array(16);
+      function successfulLoad(instrument, channel) {
+	MIDI.programChange(channel, MIDI.GM.byName[instrument].number);
+	channelInstruments[channel] = instrument;
+	document.getElementById("status").innerText = "";
+	console.log("loaded " + instrument + " on channel " + channel);
+      }
+      
+      var note2code = { "C" : 60, "D" : 62, "E" : 64, "F" : 65, "G" : 67, "A" : 69, "B" : 71,
+			"c" : 72, "d" : 74, "e" : 76, "f" : 77, "g" : 79, "a" : 81, "b" : 83 }
+      var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".split("");
+      var notes = "ABCDEFGABCDEFGABCDEFGABCDEabcdefgabcdefgabcdefgabcde".split("");
+      var char2note = {};
+      for (var i = 0; i < chars.length; i++) {
+	char2note[chars[i]] = notes[i];
+      }
+      function text2Notes(text) {
+	var letters = text.split("");
+	var notes = [];
+	for (var i = 0; i < letters.length; i++) {
+	  notes[i] = note2code[char2note[letters[i]]];
+	}
+	return notes;
+      }
+      // cdecd.def.f.e.e.cdecd.def.g.c. // J'ai du bon tabac
+      // cccde.d.ceddc.. ddddA.A.dcBAG.. // Au clair de la lune
+      // GGA.G.c.B. GGA.G.d.c. GGg.e.c.B.A. ffe.c.d.c. // Happy Birthday
+      // B B c d d c B A G G A B B A A . B B c d d c B A G G A B A G G // Ode to Joy
+      // c d e c c d e c e f g.. e f g... gagfe c gagfe c  c G c... c G c... // Frere Jacques
+      // c c d e c e d G c c d e c.. B.. c c d e f e d c B G A B c.. c.. // Yankee Doodle
+      // C  C  C DE  E DE FG     cccGGGEEECCCG FE DC      // Row your boat
+      // best find so far:
+      // vive la france
+      
+      function playWordFromInput() {
+	var word = document.getElementById("playWordInput").value;
+	var channel = document.getElementById("playChannel").value;
+	loadInstrumentFromPage(function() { playWordInPage(word, channel, 0, true); });	
+      }
+      function playWordInPage(word, channel, newline, insert, textid) {
+	if (!textid) textid = "melodies";
+	playWord(word, channel);
+	if (newline && newline & 2) document.getElementById(textid).innerHTML += '<br/>';
+	var link = '<a class="playLink" href="javascript:void(playWord(\''+word+'\','+channel+'))">' + word + '</a> ';
+	if (insert) {
+	  document.getElementById(textid).innerHTML = link + document.getElementById(textid).innerHTML;
+	} else {
+	  document.getElementById(textid).innerHTML += link;
+	}
+	if (newline && newline & 1) document.getElementById(textid).innerHTML += '<br/>';
+	if (document.getElementById("signature").innerText == "") {
+	  document.getElementById("signature").innerHTML = ' <span title="Card app originally written for Leonore\'s 12th birthday">*</span> ';
+	  setTimeout(function(){ playWordInPage(signature,   0, 0, false, "signature") }, signatureDelay);
+	}
+      }
+      function playWord(word, channel) {
+	document.getElementById("playWordInput").value = word;
+	document.getElementById("playChannel").value = channel;
+	document.getElementById('playInstrument').value = channelInstruments[channel]
+	var notes = text2Notes(word);
+	playNotes(notes, channel);
+      }
+      function playNotes(notes, channel) {
+	var velocity = 100; // how hard the note hits
+	var delay = 0;
+	var noteDuration = 0.2;
+	var noteFrequency = 0.2;
+	for (var i = 0; i < notes.length; i++) {
+	  MIDI.noteOn(channel, notes[i], velocity, delay);
+	  MIDI.noteOff(channel, notes[i], delay + noteDuration);
+	  delay += noteFrequency;
+	}
+	//console.log(MIDI.keyToNote["C4"]); // A0 => 21
+      }
+      function updateChannel() {
+	var i;
+	if (channelInstruments[document.getElementById('playChannel').value] !== undefined) {
+	  // search for first unused channel, if there is one
+	  for (i = 0; i < channelInstruments.length; i++) {
+	    if(channelInstruments[i] === undefined) {
+	      document.getElementById('playChannel').value = i;
+	      break;
+	    }
+	  }
+	}
+      }
+      function updateInstrument() {	
+	if (channelInstruments[document.getElementById('playChannel').value] !== undefined) {
+	  document.getElementById('playInstrument').value = channelInstruments[document.getElementById('playChannel').value];
+	} else {
+	  document.getElementById('playInstrument').value = "";
+	}
+      }
+      // Just for testing
+      chords = [[37,59,61,71,80],[38,60,62,72,81],[39,61,63,73,82]];
+      function playChords() {
+	for (var i = 0; i < 6; i++){
+	  playChord(i/2, chords[i%chords.length]);
+	}	
+      }
+      function playChord(delay, chord) {
+	MIDI.chordOn(0, chord, 127, delay);
+	MIDI.chordOff(0, chord, delay+1);
+      }
+      
+      function getParameterByName(name) {
+	name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+	var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+	    results = regex.exec(location.search);
+	return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+      }
+    </script>
+    <div>
+      <input type="text" id="playWordInput" value="Bon Anniv Adel!"
+	     onkeydown="if (event.keyCode == 13) document.getElementById('playWordButton').click()"/>
+      <button id="playWordButton" onclick="playWordFromInput()">Play</button>
+      <button id="playHBD" onclick="wishHappy()">HBD</button>
+    </div>
+    <div id="melodies"></div>
+    <div><span id="status">loading sounds</span></div>
+    <div>
+      <select id="playInstrument" onChange="updateChannel()">
+      </select>
+      <select id="playChannel" onChange="updateInstrument()">
+	<option value="0" selected="selected">0</option> 
+	<option value="1">1</option>
+	<option value="2">2</option>
+	<option value="3">3</option>
+	<option value="4">4</option>
+	<option value="5">5</option>
+	<option value="6">6</option>
+	<option value="7">7</option>
+	<option value="8">8</option>
+	<option value="9">9</option>
+	<option value="10">10</option>
+	<option value="11">11</option>
+	<option value="12">12</option>
+	<option value="13">13</option>
+	<option value="14">14</option>
+	<option value="15">15</option>
+      </select>
+      <!--<button id="loadNew" onclick="loadInstrumentFromPage()">Load new</button>-->
+    </div>
+    <!-- pre>
+      TODO: use ABC notation also for duration, maybe also incidentals
+      TODO: don't allow HTML, or sanitize it
+    </pre -->
+
+    <!--
+    <div><button id="playChords" onclick="playChords()">Play Chords</button></div>
+    -->
+    
+    <div id="signature"></div>
+  </body>
+</html>
