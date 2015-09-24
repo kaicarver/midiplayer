@@ -143,7 +143,7 @@
 	MIDI.programChange(channel, MIDI.GM.byName[instrument].number);
 	channelInstruments[channel] = instrument;
 	document.getElementById("status").innerText = "";
-	//console.log("loaded " + instrument + " on channel " + channel);
+	console.log("loaded " + instrument + " on channel " + channel);
       }
       
       var note2code = { "C" : 60, "D" : 62, "E" : 64, "F" : 65, "G" : 67, "A" : 69, "B" : 71,
@@ -171,7 +171,6 @@
       // c c d e c e d G c c d e c.. B.. c c d e f e d c B G A B c.. c.. // Yankee Doodle
       // C  C  C DE  E DE FG     cccGGGEEECCCG FE DC      // Row your boat
       // С днем ​​рождения
-      // Celia   Celia   Celia e f d     dddba   dddba   dddba d e c  // Celia bday song?
       // best find so far:
       // vive la france
       
@@ -181,17 +180,6 @@
 	loadInstrumentFromPage(function() { playWordInPage(word, channel, 0, true); });	
       }
       function playWordInPage(word, channel, newline, insert, textid) {
-	var time = 0;
-	var words = word.split("|");
-	for (var i = 0; i < words.length; i++) {
-	  var word = words[i];
-	  (function(word,time) {
-	    setTimeout(function(){playWordInPage2(word, channel, newline, insert, textid)}, time);
-	  })(word,time);
-	  time += (word.length + 2) * 200;
-	}
-      }
-      function playWordInPage2(word, channel, newline, insert, textid) {
 	if (!textid) textid = "melodies";
 	playWord(word, channel);
 	if (newline && newline & 2) document.getElementById(textid).innerHTML += '<br/>';
