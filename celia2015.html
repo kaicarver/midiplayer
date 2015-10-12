@@ -21,6 +21,7 @@
     <style type="text/css">
       body, #message { font-family: "Lucida Console", Monaco, monospace; font-size: 4.5vw; text-align: center; }
       #message { font-size: 0.6em; width: 20em; border: 0px solid; outline: none; }
+      #ui { display: none; }
       button { font-family: Arial; font-size: 3vw; }
       select { font-family: Arial; font-size: 2vw; border: 0px solid; outline: none; }
       #melodies { white-space: pre-wrap; font-family: "Lucida Console", Monaco, monospace; line-height: 2em; }
@@ -34,7 +35,7 @@
     </style>
   </head>
   <body>
-    <div>
+    <div id="ui">
       <input type="text" id="message" value="Celia   |Celia   |Celia |e f d     |Dddba   |Dddba   |Dddba |d e c     "
 	     onkeydown="if (event.keyCode == 13) document.getElementById('playWordButton').click()"/><br/>
       <button id="playWordButton" onclick="playWordFromInput()">Play</button>
@@ -113,6 +114,7 @@
 						      function() { document.getElementById("playChannel").value=2;
 								   document.getElementById("playInstrument").value="vibraphone";
 								   document.getElementById('playWordButton').click();
+								   document.getElementById('ui').style.display = "block";
 								 })})
 	  }
 	});
