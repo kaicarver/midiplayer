@@ -25,7 +25,7 @@
     <style type="text/css">
       body, #message { font-family: "Lucida Console", Monaco, monospace; font-size: 4.5vw; text-align: center; }
       #message { font-size: 0.6em; width: 20em; border: 0px solid; outline: none; }
-      #ui { display: none; }
+      #ui { visibility: hidden; xdisplay: none; }
       button { font-family: Arial; font-size: 3vw; }
       select { font-family: Arial; font-size: 2vw; border: 0px solid; outline: none; }
       #melodies { white-space: pre-wrap; font-family: "Lucida Console", Monaco, monospace; line-height: 2em; }
@@ -46,7 +46,7 @@
       <button id="playHBD" onclick="wishHappy()">HBD</button>
     </div>
     <div id="melodies"></div>
-    <div><span id="status">loading sounds</span></div>
+    <div id="status">loading sounds</div>
     <div>
       <select id="playInstrument" onChange="updateChannel()">
       </select>
@@ -124,7 +124,8 @@
 						      function() { document.getElementById("playChannel").value=2;
 								   document.getElementById("playInstrument").value="vibraphone";
 								   //document.getElementById('playWordButton').click();
-								   document.getElementById('ui').style.display = "block";
+								   //document.getElementById('ui').style.display = "block";
+								   document.getElementById('ui').style.visibility = "visible";
 								 })})
 	  }
 	});
@@ -202,7 +203,7 @@
       function successfulLoad(instrument, channel) {
 	MIDI.programChange(channel, MIDI.GM.byName[instrument].number);
 	channelInstruments[channel] = instrument;
-	document.getElementById("status").innerText = "";
+	document.getElementById("status").innerHTML = "&nbsp;";
 	//console.log("loaded " + instrument + " on channel " + channel);
       }
       
