@@ -18,6 +18,10 @@
     <script src="js/util/dom_request_xhr.js" type="text/javascript"></script>
     <script src="js/util/dom_request_script.js" type="text/javascript"></script>
 
+    <!-- to play MIDI file online -->
+    <!-- <script type="text/javascript" src="http://www.midijs.net/lib/midi.js"></script> -->
+    <script type="text/javascript" src="midi.js"></script>
+
     <style type="text/css">
       body, #message { font-family: "Lucida Console", Monaco, monospace; font-size: 4.5vw; text-align: center; }
       #message { font-size: 0.6em; width: 20em; border: 0px solid; outline: none; }
@@ -69,14 +73,15 @@
     <div id="signature"></div>
     <div id="score">
       <img src="celia/celia_song.svg"/>
-      <a href="celia/celia_song.mid">Celia's song in MIDI</a>
+      <a href="celia/celia_song.mid" onClick="MIDIjs.play('celia/celia_song.mid'); return false;">Celia's song in MIDI</a>
+      <a href="#" onClick="MIDIjs.stop(); return false;">Stop</a>
       <img src="celia/celia_song_lyrics.svg"/>
       <a href="celia/celia_song_lyrics.mp3" target="_blank">Celia's song sung by a robot:</a><br/>
       <audio controls>
 	<source src="https://raw.githubusercontent.com/kaicarver/midiplayer/master/celia/celia_song_lyrics.mp3" type="audio/mpeg">
 	  Your browser does not support the audio element.
       </audio>
-      <a href="celia/celia_song_lyrics.mp3" target="_blank">mp3</a>
+      <a href="celia/celia_song_lyrics.mp3" target="_blank">mp3 file</a>
       <div>
 	<a href="celia/celia_song.abc" target="_blank">Celia's song in abc notation</a>
 	<a href="celia/celia_song_lyrics.abc" target="_blank">Celia's song with lyrics in abc notation</a>
@@ -118,7 +123,7 @@
 			   function(){ loadInstrument("vibraphone",2,
 						      function() { document.getElementById("playChannel").value=2;
 								   document.getElementById("playInstrument").value="vibraphone";
-								   document.getElementById('playWordButton').click();
+								   //document.getElementById('playWordButton').click();
 								   document.getElementById('ui').style.display = "block";
 								 })})
 	  }
