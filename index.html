@@ -30,6 +30,7 @@
     <script type="text/javascript">
       
       personName = 'LEONORE';
+      instrument = "acoustic_grand_piano";
       window.onload = function () {
 	if (getParameterByName('playWord') !== "") {
 	  document.getElementById('playWord').value = getParameterByName('playWord');
@@ -37,13 +38,17 @@
 	if (getParameterByName('personName') !== "") {
 	  personName = getParameterByName('personName');
 	}
+	if (getParameterByName('instrument') !== "") {
+	  instrument = getParameterByName('instrument');
+	}
 	var instruments = Object.keys(MIDI.GM.byName);
 	var html = "";
 	for (var key in MIDI.GM.byName) {
-	  html += '<option value="'+key+'">'+key+'</option>';
+	  selected = '';
+	  if (key === instrument) { selected = ' selected'; }
+	  html += '<option value="'+key+'"'+selected+'>'+key+'</option>';
 	}
 	document.getElementById("playInstrument").innerHTML = html;
-	var instrument = "acoustic_grand_piano";
 	var channel = 0;
 	document.getElementById("status").innerText = "loading " + instrument + " to channel " + channel;
 	MIDI.loadPlugin({
@@ -57,8 +62,9 @@
 	  },
 	  onsuccess: function() {
 	    successfulLoad(instrument, channel);
-	    loadInstrument("tubular_bells",1,
-			   function(){ loadInstrument("vibraphone",2) })
+	    setTimeout(playWordFromInput, 5000);
+	    //loadInstrument("tubular_bells",1,
+	    //		   function(){ loadInstrument("vibraphone",2) })
 	  }
 	});
       };
